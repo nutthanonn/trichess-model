@@ -23,7 +23,6 @@ async def wait_my_turn(trichess):
             await trichess.check_turn()
             turn_response = await trichess.receive_response()
 
-            print(f"This is fucking turn {turn_response}")
             if turn_response['Status'] == "Success":
                 if turn_response['YourTurn']:
                     return turn_response
@@ -32,9 +31,7 @@ async def wait_my_turn(trichess):
 
         time.sleep(1)
 
-async def get_my_piece(trichess, turn_response):
-    trichess.Board = turn_response['Board']
-
+async def get_my_piece(trichess):
     await trichess.myPiece()
     my_piece_response = await trichess.receive_response()
 
@@ -49,7 +46,7 @@ async def get_my_piece(trichess, turn_response):
             trichess.Piece = my_piece_response['Board']
             break
 
-    print(f"This is samle of piece {trichess.Piece[10:]}")
+    print(f"This is samle of piece {trichess.Piece[5:]}")
 
 async def get_all_possible_move(trichess):
     field = {}
@@ -94,8 +91,9 @@ async def main(url):
         turn_response = await wait_my_turn(trichess)
         if turn_response:
             print(MESSAGE.MY_TURN)
+            trichess.Board = turn_response['Board']
 
-            await get_my_piece(trichess=trichess, turn_response=turn_response)
+            await get_my_piece(trichess)
             
             possible_move = await get_all_possible_move(trichess)
 

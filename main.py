@@ -110,7 +110,7 @@ async def main(url):
             await trichess.check_turn()
             turn_response = await trichess.receive_response()
             print(f"This is fucking turn {turn_response}")
-            if turn_response['Status'] != "Success":
+            if turn_response['Status'] == "Success":
                 if turn_response['YourTurn']:
                     print(f"{'='*10}This is my turn!!!!{'='*10}")
 

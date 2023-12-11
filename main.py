@@ -98,5 +98,6 @@ async def main(url):
         time.sleep(1)
 
 if __name__ == '__main__':
-    URL = 'ws://192.168.189.67:8181/game'
+    # URL = 'ws://192.168.189.67:8181/game'
+    URL = input("Enter URL: ")
     asyncio.run(main(URL))

@@ -44,10 +44,7 @@ class Game:
 
         try:
             json_response = json.loads(response)
-            if json_response['Status'] == "Success":
-                print(f'JSON response: {json_response}')
-
-        except json.JSONDecodeError as e:
+        except json.JSONDecodeError:
             print(f'Received non-JSON response: {response} unable to extract json.')
 
         return json_response
@@ -90,7 +87,7 @@ async def main(url):
     while True:
         try:
             game_start = await game.receive_response()
-            print("This fucking shit: ", game_start)
+            print(game_start['Started'])
             if game_start['Status'] != "Started":
                 break
         except:

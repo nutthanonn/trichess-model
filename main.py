@@ -43,8 +43,11 @@ async def get_my_piece(trichess):
         while True:
             await trichess.myPiece()
             my_piece_response = await trichess.receive_response()
-            trichess.Piece = my_piece_response['Board']
-            break
+            if my_piece_response['Status'] == 'Success':
+                trichess.Piece = my_piece_response['Board']
+                break
+
+            time.sleep(1)
 
     print(f"This is samle of piece {trichess.Piece[5:]}")
 
@@ -55,7 +58,7 @@ async def get_all_possible_move(trichess):
     for current_place in trichess.Piece:
         await trichess.move_able(current_place)
         piece_movable = await trichess.receive_response()
-        print(piece_movable)
+        print(f'Test on {current_place}')
         if piece_movable['Status'] == 'Success' and 'MovableFields' in piece_movable['Message']:
             for val in piece_movable['MovableFields']:
                 field[current_place].append(val['Field'])
@@ -65,10 +68,14 @@ async def get_all_possible_move(trichess):
             while True:
                 await trichess.move_able(current_place)
                 piece_movable = await trichess.receive_response()
+                print(f'Test on {current_place} again because status not success')
                 if piece_movable['Status'] == 'Success' and 'MovableFields' in piece_movable['Message']:
                     for val in piece_movable['MovableFields']:
                         field[current_place].append(val['Field'])
                     break
+
+                time.sleep(1)
+                    
     return field
 
 def play_random(possible_move):

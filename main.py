@@ -90,30 +90,29 @@ async def main(url):
         try:
             await game.check_turn()
             turn_response = await game.receive_response()
-            print(turn_response)
             if turn_response['Status'] != "Started":
-                print(f"This is turn message: {turn_response}")
-                board = await game.receive_response()
-                print(f"Board: {board}")
                 break
         except:
             pass
 
         time.sleep(1)
+    
+    board = await game.receive_response()
+    print(f"Board: {board}")
 
-    while True:
-        try:
-            await game.check_turn()
-            turn_response = await game.receive_response()
-            print(turn_response)
-            if turn_response['Status'] != "Started":
-                print(f"This is turn message: {turn_response}")
-                board = await game.receive_response()
-                print(f"Board: {board}")
-        except:
-            pass
+    # while True:
+    #     try:
+    #         await game.check_turn()
+    #         turn_response = await game.receive_response()
+    #         print(turn_response)
+    #         if turn_response['Status'] != "Started":
+    #             print(f"This is turn message: {turn_response}")
+    #             board = await game.receive_response()
+    #             print(f"Board: {board}")
+    #     except:
+    #         pass
 
-        time.sleep(1)
+    #     time.sleep(1)
 
 if __name__ == '__main__':
     URL = 'ws://192.168.1.100:8181/game'

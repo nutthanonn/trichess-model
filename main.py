@@ -21,7 +21,7 @@ class Game:
             print(f'Password received from server: {self.password}')
 
         except json.JSONDecodeError:
-            print('Received non-JSON response, unable to extract password.')
+            print('Received non-JSON response, unable to extract json.')
 
     def auto_move(self):
         return f"{random.choice(['B', 'G', 'R'])}{random.choice(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])}{random.choice(['1', '2', '3', '4'])}", f"{random.choice(['B', 'G', 'R'])}{random.choice(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])}{random.choice(['1', '2', '3', '4'])}"
@@ -45,8 +45,8 @@ class Game:
             if json_response['Status'] == "Success":
                 print(f'JSON response: {json_response}')
 
-        except json.JSONDecodeError:
-            print('Received non-JSON response, unable to extract json.')
+        except json.JSONDecodeError as e:
+            print(f'Received non-JSON response: {response}, unable to extract json.')
 
         return json_response
 
@@ -85,7 +85,6 @@ async def main(url):
     await game.connect()
 
     # loop wait to connect to game
-
     while True:
         try:
             game_start = await game.receive_response()
@@ -97,25 +96,18 @@ async def main(url):
 
         time.sleep(1)
     
-    board = await game.receive_response()
-    print(f"Board: {board}")
-    
-    board = await game.receive_response()
-    print(f"Board: {board}")
+    # loop wait my turn
+    while True:
+        try:
+            await game.check_turn()
+            turn_response = await game.receive_response()
+            print(turn_response)
+            if turn_response['Status'] != "Success":
+                print(f"This is turn message: {turn_response}")
+        except:
+            pass
 
-    # while True:
-    #     try:
-    #         await game.check_turn()
-    #         turn_response = await game.receive_response()
-    #         print(turn_response)
-    #         if turn_response['Status'] != "Started":
-    #             print(f"This is turn message: {turn_response}")
-    #             board = await game.receive_response()
-    #             print(f"Board: {board}")
-    #     except:
-    #         pass
-
-    #     time.sleep(1)
+        time.sleep(1)
 
 if __name__ == '__main__':
     URL = 'ws://192.168.1.100:8181/game'

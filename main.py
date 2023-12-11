@@ -40,13 +40,15 @@ class Game:
 
     async def receive_response(self):
         response = await self.websocket.recv()
+        response = response.replace("True", 'true')
+
         try:
             json_response = json.loads(response)
             if json_response['Status'] == "Success":
                 print(f'JSON response: {json_response}')
 
         except json.JSONDecodeError as e:
-            print(f'Received non-JSON response: {response}, unable to extract json.')
+            print(f'Received non-JSON response: {response} unable to extract json.')
 
         return json_response
 

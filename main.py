@@ -84,10 +84,28 @@ async def main(url):
     game = Game(url)
     await game.connect()
 
+    # loop wait to connect to game
+
     while True:
         try:
             await game.check_turn()
             turn_response = await game.receive_response()
+            print(turn_response)
+            if turn_response['Status'] != "Started":
+                print(f"This is turn message: {turn_response}")
+                board = await game.receive_response()
+                print(f"Board: {board}")
+                break
+        except:
+            pass
+
+        time.sleep(1)
+
+    while True:
+        try:
+            await game.check_turn()
+            turn_response = await game.receive_response()
+            print(turn_response)
             if turn_response['Status'] != "Started":
                 print(f"This is turn message: {turn_response}")
                 board = await game.receive_response()
@@ -98,6 +116,6 @@ async def main(url):
         time.sleep(1)
 
 if __name__ == '__main__':
-    # URL = 'ws://192.168.189.67:8181/game'
-    URL = input("Enter URL: ")
+    URL = 'ws://192.168.1.100:8181/game'
+    # URL = input("Enter URL: ")
     asyncio.run(main(URL))

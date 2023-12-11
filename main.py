@@ -48,7 +48,7 @@ class Game:
         except json.JSONDecodeError:
             print('Received non-JSON response, unable to extract json.')
 
-        return response
+        return json_response
 
     def reconnecting_game(self):
         pass

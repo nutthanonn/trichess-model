@@ -4,7 +4,6 @@ import random
 import asyncio
 import time
 
-
 class Game:
     def __init__(self, uri):
         self.uri = uri
@@ -50,7 +49,6 @@ class Game:
             print('Received non-JSON response, unable to extract json.')
 
         return response
-        
 
     def reconnecting_game(self):
         pass
@@ -77,7 +75,6 @@ class Game:
             "Command": "CheckTurn",
             "Password": self.password,
         }
-        
         await self.websocket.send(json.dumps(data))
 
     def solver(self, board):
@@ -91,11 +88,13 @@ async def main(url):
         try:
             await game.check_turn()
             turn_response = await game.receive_response()
-            print(turn_response)
-            # if turn_response['Status'] != "Error":
-            #     if turn_response['YourTurn'] != False:
+            if turn_response['Status'] != "Started":
+                print(f"This is turn message: {turn_response}")
+                board = await game.receive_response()
+                print(f"Board: {board}")
         except:
             pass
+
         time.sleep(1)
 
 if __name__ == '__main__':

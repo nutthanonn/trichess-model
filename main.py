@@ -99,6 +99,9 @@ async def main(url):
     
     board = await game.receive_response()
     print(f"Board: {board}")
+    
+    board = await game.receive_response()
+    print(f"Board: {board}")
 
     # while True:
     #     try:

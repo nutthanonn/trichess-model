@@ -12,4 +12,3 @@
     "Promotion": {PromotionPiece}
 }
 ```
-# trichess-model

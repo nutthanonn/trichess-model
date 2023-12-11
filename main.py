@@ -41,7 +41,7 @@ async def get_my_piece(trichess, turn_response):
     if my_piece_response['Status'] == 'Success':
         trichess.Piece = my_piece_response['Board']
 
-        # handle status not success
+    # handle status not success
     else:
         while True:
             await trichess.myPiece()
@@ -56,16 +56,19 @@ async def get_all_possible_move(trichess):
     for current_place in trichess.Piece:
         await trichess.move_able(current_place)
         piece_movable = await trichess.receive_response()
+        print(piece_movable)
         if piece_movable['Status'] == 'Success':
-            field[current_place] = list(piece_movable['MovableFields'].values())
+            for val in piece_movable['MovableFields']:
+                field[current_place].append(val['Field'])
 
-            # handle status not success
+        # handle status not success
         else:
             while True:
                 await trichess.move_able(current_place)
                 piece_movable = await trichess.receive_response()
                 if piece_movable['Status'] == 'Success':
-                    field[current_place] = list(piece_movable['MovableFields'].values())
+                    for val in piece_movable['MovableFields']:
+                        field[current_place].append(val['Field'])
                     break
     return field
 
@@ -76,6 +79,7 @@ def play_random(possible_move):
     print(f"This is random piece: {random_piece} and random move: {random_move}")
 
     return random_piece, random_move
+
 
 async def main(url):
     trichess = Trichess.Trichess(url)

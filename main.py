@@ -4,43 +4,18 @@ import random
 import asyncio
 import time
 
-class Game:
+class Trichess:
     def __init__(self, uri):
         self.uri = uri
-        self.websocket = None
-        self.password = None
-
-    async def connect(self):
-        self.websocket = await websockets.connect(self.uri)
-        response = await self.websocket.recv()
-        print(f'Response from server: {response}')
-
-        try:
-            json_response = json.loads(response)
-            self.password = json_response['Password']
-            print(f'Password received from server: {self.password}')
-
-        except json.JSONDecodeError:
-            print('Received non-JSON response, unable to extract json.')
-
-    def auto_move(self):
-        return f"{random.choice(['B', 'G', 'R'])}{random.choice(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])}{random.choice(['1', '2', '3', '4'])}", f"{random.choice(['B', 'G', 'R'])}{random.choice(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])}{random.choice(['1', '2', '3', '4'])}"
-
-    async def send_move(self, piece_field_from, piece_field_to):
-        data = {
-            "Command": "Move",
-            "Password": self.password,
-            "Move": {
-                "From": piece_field_from,
-                "To": piece_field_to
-            }
-        }
-        
-        await self.websocket.send(json.dumps(data))
+        self.ebsocket = None
+        self.Password = None
+        self.Player = None
+        self.Board = None
 
     async def receive_response(self):
         response = await self.websocket.recv()
         response = response.replace("True", 'true')
+        response = response.replace("False", 'false')
 
         try:
             json_response = json.loads(response)
@@ -48,6 +23,32 @@ class Game:
             print(f'Received non-JSON response: {response} unable to extract json.')
 
         return json_response
+
+    async def connect(self):
+        self.websocket = await websockets.connect(self.uri)
+        player_data = await self.receive_response()
+        self.Password = player_data['Password']
+        self.player = player_data['Player']
+        print(f'Password: {self.Password}, Player: {self.Player}')
+    
+    async def move_able(self, piece_field):
+        data = {
+            "Command": "Movable",
+            "Password": self.Password,
+            "Field": piece_field
+        }
+        await self.websocket.send(json.dumps(data))
+
+    async def send_move(self, piece_field_from, piece_field_to):
+        data = {
+            "Command": "Move",
+            "Password": self.Password,
+            "Move": {
+                "From": piece_field_from,
+                "To": piece_field_to,
+            }
+        }
+        await self.websocket.send(json.dumps(data))
 
     def reconnecting_game(self):
         pass
@@ -61,9 +62,8 @@ class Game:
     async def myPiece(self):
         data = {
             "Command": "MyPiece",
-            "Password": self.password
+            "Password": self.Password
         }
-
         await self.websocket.send(json.dumps(data))
 
     def promote(self):
@@ -72,22 +72,31 @@ class Game:
     async def check_turn(self):
         data = {
             "Command": "CheckTurn",
-            "Password": self.password,
+            "Password": self.Password,
         }
         await self.websocket.send(json.dumps(data))
 
-    def solver(self, board):
-        pass
+"""
+"Board": [
+    { "Field": "BA1", "Piece": "Rook", "Owner": "Player1" },
+]
+"""
+def filter_own_piece(board, player):
+    for piece in board:
+        if piece['Owner'] != player:
+            board.remove(piece)
+    
+    return board
 
 async def main(url):
-    game = Game(url)
-    await game.connect()
+    trichess = Trichess(url)
+    await trichess.connect()
 
     # loop wait to connect to game
     while True:
         try:
-            game_start = await game.receive_response()
-            print("Game", game_start, game_start['Status'])
+            game_start = await trichess.receive_response()
+            print("Game", game_start)
             if game_start['Status'] != "Success":
                 break
         except:
@@ -98,11 +107,14 @@ async def main(url):
     # loop wait my turn
     while True:
         try:
-            await game.check_turn()
-            turn_response = await game.receive_response()
-            print("TURN", turn_response)
+            await trichess.check_turn()
+            turn_response = await trichess.receive_response()
             if turn_response['Status'] != "Success":
-                print(f"This is turn message: {turn_response}")
+                if turn_response['YourTurn']:
+                    print(f"{'='*10}This is my turn!!!!{'='*10}")
+
+                    trichess.Board = filter_own_piece(turn_response['Board'], trichess.Player)
+                    print(f"This is my piece: {trichess.Board}")
         except:
             pass
 

@@ -87,7 +87,7 @@ async def main(url):
     while True:
         try:
             game_start = await game.receive_response()
-            print(game_start['Started'])
+            print(game_start)
             if game_start['Status'] != "Started":
                 break
         except:

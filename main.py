@@ -96,7 +96,7 @@ async def main(url):
     while True:
         try:
             game_start = await trichess.receive_response()
-            print("Game", game_start)
+            print("Fuck you game: ", game_start)
             if game_start['Status'] != "Success":
                 break
         except:

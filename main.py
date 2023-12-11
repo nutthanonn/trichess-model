@@ -28,7 +28,7 @@ class Trichess:
         self.websocket = await websockets.connect(self.uri)
         player_data = await self.receive_response()
         self.Password = player_data['Password']
-        self.player = player_data['Player']
+        self.Player = player_data['Player']
         print(f'Password: {self.Password}, Player: {self.Player}')
     
     async def move_able(self, piece_field):
@@ -109,6 +109,7 @@ async def main(url):
         try:
             await trichess.check_turn()
             turn_response = await trichess.receive_response()
+            print(f"This is fucking turn {turn_response}")
             if turn_response['Status'] != "Success":
                 if turn_response['YourTurn']:
                     print(f"{'='*10}This is my turn!!!!{'='*10}")

@@ -49,12 +49,14 @@ async def get_my_piece(trichess):
     print(f"This is samle of piece {trichess.Piece[5:]}")
 
 async def get_all_possible_move(trichess):
+    ## fix because this will recv my piece response
+
     field = {}
     for current_place in trichess.Piece:
         await trichess.move_able(current_place)
         piece_movable = await trichess.receive_response()
         print(piece_movable)
-        if piece_movable['Status'] == 'Success':
+        if piece_movable['Status'] == 'Success' and 'MovableFields' in piece_movable['Message']:
             for val in piece_movable['MovableFields']:
                 field[current_place].append(val['Field'])
 
@@ -63,7 +65,7 @@ async def get_all_possible_move(trichess):
             while True:
                 await trichess.move_able(current_place)
                 piece_movable = await trichess.receive_response()
-                if piece_movable['Status'] == 'Success':
+                if piece_movable['Status'] == 'Success' and 'MovableFields' in piece_movable['Message']:
                     for val in piece_movable['MovableFields']:
                         field[current_place].append(val['Field'])
                     break

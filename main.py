@@ -70,8 +70,12 @@ async def get_all_possible_move(trichess):
         if piece_movable['Status'] == 'Success':
             print(f'Test on {current_place} success')
             if 'MovableFields' in piece_movable['Message']:
+
                 for val in piece_movable['MovableFields']:
-                    field[current_place].append(val['Field'])
+                    if current_place not in field:
+                        field[current_place] = []
+                    else:
+                        field[current_place].append(val['Field'])
 
         # handle status not success
         else:
@@ -82,7 +86,10 @@ async def get_all_possible_move(trichess):
                 if piece_movable['Status'] == 'Success':
                     if 'MovableFields' in piece_movable['Message']:
                         for val in piece_movable['MovableFields']:
-                            field[current_place].append(val['Field'])
+                            if current_place not in field:
+                                field[current_place] = []
+                            else:
+                                field[current_place].append(val['Field'])
                         break
 
                 time.sleep(1)

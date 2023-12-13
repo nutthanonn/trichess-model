@@ -3,7 +3,6 @@ import time
 import MESSAGE
 import Trichess
 import random
-import websockets
 
 async def wait_connection(trichess):
     while True:
@@ -66,7 +65,15 @@ async def get_all_possible_move(trichess):
             if 'MovableFields' in piece_movable['Message']:
                 for val in piece_movable['MovableFields']:
                     field[current_place].append(val['Field'])
+            else:
+                while True:
+                    await trichess.move_able(current_place)
+                    piece_movable = await trichess.receive_response()
+                    if 'MovableFields' in piece_movable['Message']:
+                        for val in piece_movable['MovableFields']:
+                            field[current_place].append(val['Field'])
                     
+                    time.sleep(1)
         # handle status not success
         else:
             while True:

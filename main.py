@@ -2,7 +2,8 @@ import asyncio
 import time
 import MESSAGE
 import Trichess
-import random
+import algorithm
+
 
 
 async def wait_connection(trichess):
@@ -32,63 +33,43 @@ async def wait_my_turn(trichess):
         time.sleep(1)
 
 async def get_my_piece(trichess):
-    await trichess.myPiece()
-    my_piece_response = await trichess.receive_response()
+    while True:
+        await trichess.myPiece()
+        my_piece_response = await trichess.receive_response()
 
-    if my_piece_response['Status'] == 'Success':
-        trichess.Piece = my_piece_response['Board']
-
-    # handle status not success
-    else:
-        while True:
-            await trichess.myPiece()
-            my_piece_response = await trichess.receive_response()
-            if my_piece_response['Status'] == 'Success':
+        if my_piece_response['Status'] == 'Success':
+            if 'Check board for piece' in my_piece_response['Message']:
                 trichess.Piece = my_piece_response['Board']
                 break
+            
+        time.sleep(1)
 
-            time.sleep(1)
-
-    print(f"This is samle of piece {trichess.Piece[5:]}")
-
+    print(f"This is samle of piece {trichess.Piece[:5]}")
     return None
 
-async def get_all_possible_move(trichess):
-    # fix because this will recv my piece response
 
+async def get_all_possible_move(trichess):
     field = {}
     for current_place in trichess.Piece:
+        current_place = current_place['Field']
+        
         await trichess.move_able(current_place)
         piece_movable = await trichess.receive_response()
-        print(f'Test on {current_place}')
 
-        if piece_movable['Status'] == 'Success' and piece_movable['MovableFields']:
-            for val in piece_movable['MovableFields']:
-                field[current_place].append(val['Field'])
+        # handle no movable
+        if piece_movable['Status'] == 'Fail' and 'no movable' in piece_movable['Message']:
+            continue
 
-        # handle status not success
-        else:
-            while True:
-                await trichess.move_able(current_place)
-                piece_movable = await trichess.receive_response()
-                print(f'Test on {current_place} again because status not success')
-                if piece_movable['Status'] == 'Success' and piece_movable['MovableFields']:
-                    for val in piece_movable['MovableFields']:
+        if piece_movable['Status'] == 'Success':
+            print(f'Test on {current_place} success')
+            if 'MovableFields' in piece_movable['Message']:
+                for val in piece_movable['MovableFields']:
+                    if current_place not in field:
+                        field[current_place] = []
+                    else:
                         field[current_place].append(val['Field'])
-                    break
-
-                time.sleep(1)
                     
     return field
-
-def play_random(possible_move):
-    random_piece = random.choice(list(possible_move.keys()))
-    random_move = random.choice(possible_move[random_piece])
-
-    print(f"This is random piece: {random_piece} and random move: {random_move}")
-
-    return random_piece, random_move
-
 
 async def main(url):
     trichess = Trichess.Trichess(url)
@@ -111,13 +92,15 @@ async def main(url):
 
             print("This is possible move: ", possible_move)
 
-            random_piece, random_move = play_random(possible_move)
+            random_piece, random_move = algorithm.play_random(possible_move)
             
             await trichess.send_move(random_piece, random_move)
             move_response = await trichess.receive_response()
 
             if move_response['Status'] == 'Success':
                 print(MESSAGE.MOVE_SUCCESS)
+        
+        time.sleep(1)
 
 if __name__ == '__main__':
     URL = 'ws://192.168.1.100:8181/game'

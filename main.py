@@ -51,8 +51,10 @@ async def get_my_piece(trichess):
 
     print(f"This is samle of piece {trichess.Piece[5:]}")
 
+    return None
+
 async def get_all_possible_move(trichess):
-    ## fix because this will recv my piece response
+    # fix because this will recv my piece response
 
     field = {}
     for current_place in trichess.Piece:

@@ -62,14 +62,15 @@ async def get_all_possible_move(trichess):
         print(f'Test on {current_place}')
 
         if piece_movable['Status'] == 'Success':
+            print(f'Test on {current_place} success')
             if 'MovableFields' in piece_movable['Message']:
                 for val in piece_movable['MovableFields']:
                     field[current_place].append(val['Field'])
             else:
                 while True:
+                    print(f'Test on {current_place} again because no movable')
                     await trichess.move_able(current_place)
                     piece_movable = await trichess.receive_response()
-                    print(f'Test on {current_place} again because no movable')
                     if 'MovableFields' in piece_movable['Message']:
                         for val in piece_movable['MovableFields']:
                             field[current_place].append(val['Field'])
@@ -78,9 +79,9 @@ async def get_all_possible_move(trichess):
         # handle status not success
         else:
             while True:
+                print(f'Test on {current_place} again because status not success')
                 await trichess.move_able(current_place)
                 piece_movable = await trichess.receive_response()
-                print(f'Test on {current_place} again because status not success')
                 if piece_movable['Status'] == 'Success':
                     if 'MovableFields' in piece_movable['Message']:
                         for val in piece_movable['MovableFields']:

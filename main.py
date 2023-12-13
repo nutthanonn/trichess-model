@@ -73,6 +73,7 @@ async def get_all_possible_move(trichess):
                     print(f'Test on {current_place} again because no movable')
                     await trichess.move_able(current_place)
                     piece_movable = await trichess.receive_response()
+                    print(piece_movable)
                     if 'MovableFields' in piece_movable['Message']:
                         for val in piece_movable['MovableFields']:
                             field[current_place].append(val['Field'])

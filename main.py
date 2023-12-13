@@ -31,29 +31,23 @@ async def wait_my_turn(trichess):
         time.sleep(1)
 
 async def get_my_piece(trichess):
-    await trichess.myPiece()
-    my_piece_response = await trichess.receive_response()
+    while True:
+        await trichess.myPiece()
+        my_piece_response = await trichess.receive_response()
 
-    if my_piece_response['Status'] == 'Success':
-        trichess.Piece = my_piece_response['Board']
-
-    # handle status not success
-    else:
-        while True:
-            await trichess.myPiece()
-            my_piece_response = await trichess.receive_response()
-            if my_piece_response['Status'] == 'Success':
+        if my_piece_response['Status'] == 'Success':
+            if 'Check board for piece' in my_piece_response['Message']:
                 trichess.Piece = my_piece_response['Board']
                 break
-
-            time.sleep(1)
+        
+        time.sleep(1)
 
     print(f"This is samle of piece {trichess.Piece[:5]}")
-
     return None
 
 async def get_all_possible_move(trichess):
     # fix because this will recv my piece response
+    print(trichess.Piece)
 
     field = {}
     for current_place in trichess.Piece:

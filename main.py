@@ -39,23 +39,20 @@ async def get_my_piece(trichess):
             if 'Check board for piece' in my_piece_response['Message']:
                 trichess.Piece = my_piece_response['Board']
                 break
-        
+            
         time.sleep(1)
 
     print(f"This is samle of piece {trichess.Piece[:5]}")
     return None
 
-async def get_all_possible_move(trichess):
-    # fix because this will recv my piece response
-    print(trichess.Piece)
 
+async def get_all_possible_move(trichess):
     field = {}
     for current_place in trichess.Piece:
         current_place = current_place['Field']
-
+        
         await trichess.move_able(current_place)
         piece_movable = await trichess.receive_response()
-        print(f'Test on {current_place}')
 
         # handle no movable
         if piece_movable['Status'] == 'Fail' and 'no movable' in piece_movable['Message']:
@@ -64,40 +61,27 @@ async def get_all_possible_move(trichess):
         if piece_movable['Status'] == 'Success':
             print(f'Test on {current_place} success')
             if 'MovableFields' in piece_movable['Message']:
-
                 for val in piece_movable['MovableFields']:
                     if current_place not in field:
                         field[current_place] = []
                     else:
                         field[current_place].append(val['Field'])
-
-        # handle status not success
-        else:
-            while True:
-                print(f'Test on {current_place} again because status not success')
-                await trichess.move_able(current_place)
-                piece_movable = await trichess.receive_response()
-                if piece_movable['Status'] == 'Success':
-                    if 'MovableFields' in piece_movable['Message']:
-                        for val in piece_movable['MovableFields']:
-                            if current_place not in field:
-                                field[current_place] = []
-                            else:
-                                field[current_place].append(val['Field'])
-                        break
-
-                time.sleep(1)
                     
     return field
 
 def play_random(possible_move):
-    random_piece = random.choice(list(possible_move.keys()))
-    random_move = random.choice(possible_move[random_piece])
+    while True:
+        try:
+            print("This is possible move: ", possible_move)
+            
+            random_piece = random.choice(list(possible_move.keys()))
+            random_move = random.choice(possible_move[random_piece])
 
-    print(f"This is random piece: {random_piece} and random move: {random_move}")
+            print(f"This is random piece: {random_piece} and random move: {random_move}")
 
-    return random_piece, random_move
-
+            return random_piece, random_move
+        except:
+            pass
 
 async def main(url):
     trichess = Trichess.Trichess(url)

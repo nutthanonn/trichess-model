@@ -3,7 +3,7 @@ import time
 import MESSAGE
 import Trichess
 import random
-
+import websockets
 
 async def wait_connection(trichess):
     while True:
@@ -49,7 +49,7 @@ async def get_my_piece(trichess):
 
             time.sleep(1)
 
-    print(f"This is samle of piece {trichess.Piece[5:]}")
+    print(f"This is samle of piece {trichess.Piece[:5]}")
 
     return None
 
@@ -62,20 +62,22 @@ async def get_all_possible_move(trichess):
         piece_movable = await trichess.receive_response()
         print(f'Test on {current_place}')
 
-        if piece_movable['Status'] == 'Success' and piece_movable['MovableFields']:
-            for val in piece_movable['MovableFields']:
-                field[current_place].append(val['Field'])
-
+        if piece_movable['Status'] == 'Success':
+            if 'MovableFields' in piece_movable['Message']:
+                for val in piece_movable['MovableFields']:
+                    field[current_place].append(val['Field'])
+                    
         # handle status not success
         else:
             while True:
                 await trichess.move_able(current_place)
                 piece_movable = await trichess.receive_response()
                 print(f'Test on {current_place} again because status not success')
-                if piece_movable['Status'] == 'Success' and piece_movable['MovableFields']:
-                    for val in piece_movable['MovableFields']:
-                        field[current_place].append(val['Field'])
-                    break
+                if piece_movable['Status'] == 'Success':
+                    if 'MovableFields' in piece_movable['Message']:
+                        for val in piece_movable['MovableFields']:
+                            field[current_place].append(val['Field'])
+                        break
 
                 time.sleep(1)
                     

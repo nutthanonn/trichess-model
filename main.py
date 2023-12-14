@@ -3,6 +3,7 @@ import time
 import MESSAGE
 import Trichess
 import algorithm
+import threading
 
 
 async def wait_connection(trichess):
@@ -71,10 +72,10 @@ async def get_all_possible_move(trichess):
     return field
 
 def check_pass(possible_move):
-    return all(value is None for value in possible_move.values())
+    return all(len(value) == 0 for value in possible_move.values())
 
 
-async def main(url):
+async def main(url, type_algorithm=1):
     trichess = Trichess.Trichess(url)
     await trichess.connect()
 
@@ -106,11 +107,9 @@ async def main(url):
 
             '''
             TODO: call algorithm and return piece and move
-
-            # curr_position, move_to = algorithm.play_random(possible_move)
             '''
 
-            curr_position, move_to = algorithm.eat_priority_first(possible_move, trichess.Board)
+            curr_position, move_to = algorithm.algorithm_provider(possible_move, trichess.Board, type_algorithm)
             
             await trichess.send_move(curr_position, move_to)
             move_response = await trichess.receive_response()
@@ -120,6 +119,16 @@ async def main(url):
         time.sleep(1)
 
 if __name__ == '__main__':
+    n_player = int(input("Enter number of player [int]: "))
     URL = 'ws://192.168.1.100:8181/game'
     # URL = input("Enter URL: ")
-    asyncio.run(main(URL))
+    
+    for i in range(n_player):
+        print(f"Select algorithm for player {i+1}")
+        print(MESSAGE.ALGORITHM)
+        algo = int(input("Enter algorithm [int]: "))
+        
+        threading.Thread(target=asyncio.run, args=(main(URL, algo),)).start()
+        print("Thread: ", i, " started")
+
+        time.sleep(0.5)

@@ -10,6 +10,15 @@ VALUE_PIECE = {
     "Pawn": 1
 }
 
+def algorithm_provider(possible_move, current_board, type_algorithm):
+    if type_algorithm == 1:
+        return play_random(possible_move)
+    elif type_algorithm == 2:
+        return eat_priority_first(possible_move, current_board)
+    else:
+        return play_random(possible_move)
+    
+
 
 def play_random(possible_move):
     while True:
@@ -44,5 +53,6 @@ def eat_priority_first(possible_move, current_board):
     
     if max_piece is None or max_move is None:
         return play_random(possible_move)
-    
+
+    print(f"This is max piece: {max_piece} and max move: {max_move}")
     return max_piece, max_move

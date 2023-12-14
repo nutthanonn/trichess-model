@@ -70,7 +70,7 @@ async def get_all_possible_move(trichess):
                     
     return field
 
-async def check_pass(possible_move):
+def check_pass(possible_move):
     return all(value is None for value in possible_move.values())
 
 
@@ -101,6 +101,8 @@ async def main(url):
                 if pass_response['Status'] == 'Success':
                     print(MESSAGE.PASS)
                 continue
+        
+            print("This is possible move: ", possible_move)
 
             '''
             TODO: call algorithm and return piece and move

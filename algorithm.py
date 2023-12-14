@@ -42,4 +42,7 @@ def eat_priority_first(possible_move, current_board):
                         max_piece = piece
                         max_move = move_field
     
+    if max_piece is None or max_move is None:
+        return play_random(possible_move)
+    
     return max_piece, max_move

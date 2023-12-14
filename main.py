@@ -5,12 +5,11 @@ import Trichess
 import algorithm
 
 
-
 async def wait_connection(trichess):
     while True:
         try:
             game_start = await trichess.receive_response()
-            print("Fuck you game: ", game_start)
+            # print("Fuck you game: ", game_start)
             if game_start['Status'] != "Success":
                 return
         except:
@@ -44,7 +43,7 @@ async def get_my_piece(trichess):
             
         time.sleep(1)
 
-    print(f"This is samle of piece {trichess.Piece[:5]}")
+    print(f"This is samle of piece {trichess.Piece[:3]}")
     return None
 
 
@@ -61,7 +60,7 @@ async def get_all_possible_move(trichess):
             continue
 
         if piece_movable['Status'] == 'Success':
-            print(f'Test on {current_place} success')
+            # print(f'Test on {current_place} success')
             if 'MovableFields' in piece_movable['Message']:
                 for val in piece_movable['MovableFields']:
                     if current_place not in field:
@@ -70,6 +69,10 @@ async def get_all_possible_move(trichess):
                         field[current_place].append(val['Field'])
                     
     return field
+
+async def check_pass(possible_move):
+    return all(value is None for value in possible_move.values())
+
 
 async def main(url):
     trichess = Trichess.Trichess(url)
@@ -87,16 +90,28 @@ async def main(url):
             trichess.Board = turn_response['Board']
 
             await get_my_piece(trichess)
-            
             possible_move = await get_all_possible_move(trichess)
 
-            print("This is possible move: ", possible_move)
+            # print("This is possible move: ", possible_move)
 
-            random_piece, random_move = algorithm.play_random(possible_move)
+            # TODO: check if all possible move is None
+            if check_pass(possible_move):
+                await trichess.pass_turn()
+                pass_response = await trichess.receive_response()
+                if pass_response['Status'] == 'Success':
+                    print(MESSAGE.PASS)
+                continue
+
+            '''
+            TODO: call algorithm and return piece and move
+
+            # curr_position, move_to = algorithm.play_random(possible_move)
+            '''
+
+            curr_position, move_to = algorithm.eat_priority_first(possible_move, trichess.Board)
             
-            await trichess.send_move(random_piece, random_move)
+            await trichess.send_move(curr_position, move_to)
             move_response = await trichess.receive_response()
-
             if move_response['Status'] == 'Success':
                 print(MESSAGE.MOVE_SUCCESS)
         

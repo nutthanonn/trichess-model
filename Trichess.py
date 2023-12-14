@@ -48,14 +48,12 @@ class Trichess:
         }
         await self.websocket.send(json.dumps(data))
 
-    def reconnecting_game(self):
-        pass
-
-    def pass_turn(self):
-        pass
-
-    def check_king(self):
-        pass
+    async def pass_turn(self):
+        data = {
+            "Command": "PassTurn",
+            "Password": self.Password,
+        }
+        await self.websocket.send(json.dumps(data))
 
     async def myPiece(self):
         data = {
@@ -64,12 +62,16 @@ class Trichess:
         }
         await self.websocket.send(json.dumps(data))
 
-    def promote(self):
-        pass
-
     async def check_turn(self):
         data = {
             "Command": "CheckTurn",
             "Password": self.Password,
         }
         await self.websocket.send(json.dumps(data))
+
+    def reconnecting_game(self):
+        pass
+    def check_king(self):
+        pass
+    def promote(self):
+        pass

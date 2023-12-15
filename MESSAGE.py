@@ -19,3 +19,9 @@ PASS = '''
 ░█▄▄█ ░█▄▄█ ─▀▀▀▄▄ ─▀▀▀▄▄ 
 ░█─── ░█─░█ ░█▄▄▄█ ░█▄▄▄█
 '''
+
+
+ALGORITHM = '''
+1. play random
+2. eat priority first
+'''

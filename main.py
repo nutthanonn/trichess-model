@@ -75,7 +75,7 @@ def check_pass(possible_move):
     return all(len(value) == 0 for value in possible_move.values())
 
 
-async def main(url, type_algorithm=1):
+async def main(url, type_algorithm):
     trichess = Trichess.Trichess(url)
     await trichess.connect()
 
@@ -120,7 +120,7 @@ async def main(url, type_algorithm=1):
 
 if __name__ == '__main__':
     n_player = int(input("Enter number of player [int]: "))
-    URL = 'ws://192.168.1.100:8181/game'
+    URL = 'ws://10.7.244.205:8181/game'
     # URL = input("Enter URL: ")
     
     for i in range(n_player):

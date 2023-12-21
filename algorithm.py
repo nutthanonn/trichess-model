@@ -106,3 +106,91 @@ def eat_priority_first(enemy_possible_move, possible_move, current_board, curren
         return walk_but_dont_eat(enemy_possible_move, possible_move, current_board, current_player)
 
     return max_piece, max_move
+
+def check_8(target):
+    swap_color = {"GA":"RH", "GB":"RG", "GC":"RF", "GD":"RE", "GE":"BD", "GF":"BC", "GG":"BB", "GH":"BA",
+                  "BA":"GH", "BB":"GG", "BC":"GF", "BD":"GE", "BE":"RD", "BF":"RC", "BG":"RB", "BH":"RA",
+                  "RA":"BH", "RB":"BG", "RC":"BF", "RD":"BE", "RE":"GD", "RF":"GC", "RG":"GB", "RH":"GA",}
+    board_dict = {"A":1,"B":2,"C":3,"D":4,"E":5,"F":6,"G":7,"H":8}
+    board_list = ["A","B","C","D","E","F","G","H"]
+    number_list = ["1","2","3","4","4","3","2","1"]
+    straight = ["Queen", "Rook"]
+    oblique = ["Queen", "Bishop"]
+
+    # ไม่เล่นตรงกลาง
+    if((target[2] == "E" or target[2] == "D") and target[3] == "4"):
+        return
+    
+    # for i in range(9):
+    #     check = False
+        # target[0] + target[1] + target[2]
+        
+
+        """ concept for loop check if found enemy break small loop if its cant eat that continue but if can eat break   """
+
+        #straight
+
+        # check A B C D E F G H
+        for ii in range(board_dict[target[1]], 9):
+            #check
+            target[0] + board_list[ii] + target[2]
+            break
+
+        for ii in range(board_dict[target[1]], -1, -1):
+            #check
+            target[0] + board_list[ii] + target[2]
+            break
+        
+        #check 1 2 3 4 4 3 2 1
+        for ii in range(int(target[2]), 5):
+            break
+        for iii in range(4, 0, -1):
+                #switch color
+                check
+                break
+        
+        for ii in range(int(target[2]), 0, -1):
+            break
+
+
+        #oblique
+
+        # No switch color
+        count = 0
+        for ii in range(int(target[2]), 0, -1):
+            count += 1
+            board_list[board_dict[target[1]] - count]
+            break
+
+        count = 0
+        for ii in range(int(target[2]), 0, -1):
+            count += 1
+            board_list[board_dict[target[1]] + count]
+            break
+        
+        #switch color
+        count = 0
+        for ii in range(int(target[2]), 5):
+            count += 1
+            board_list[board_dict[target[1]] + count]
+            break
+        for iii in range(4, 0, -1):
+            #switch color
+            count += 1
+            board_list[board_dict[target[1]] + count]
+            break
+
+        count = 0
+        for ii in range(int(target[2]), 5):
+            count += 1
+            board_list[board_dict[target[1]] - count]
+            break
+        for iii in range(4, 0, -1):
+            #switch color
+            count += 1
+            board_list[board_dict[target[1]] - count]
+            # if board_list[board_dict[target[1]] - count] == "H" or board_list[board_dict[target[1]] - count] == "A":
+                # break
+
+
+    current_board = current_board['Board']

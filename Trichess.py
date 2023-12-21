@@ -4,11 +4,12 @@ import websockets
 class Trichess:
     def __init__(self, uri):
         self.uri = uri
-        self.ebsocket = None
+        self.websocket = None
         self.Password = None
         self.Player = None
         self.Board = None
         self.Piece = None
+        self.enemyPiece = None
 
     async def receive_response(self):
         response = await self.websocket.recv()

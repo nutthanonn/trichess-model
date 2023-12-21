@@ -4,11 +4,12 @@ import websockets
 class Trichess:
     def __init__(self, uri):
         self.uri = uri
-        self.ebsocket = None
+        self.websocket = None
         self.Password = None
         self.Player = None
         self.Board = None
         self.Piece = None
+        self.enemyPiece = None
 
     async def receive_response(self):
         response = await self.websocket.recv()
@@ -48,14 +49,12 @@ class Trichess:
         }
         await self.websocket.send(json.dumps(data))
 
-    def reconnecting_game(self):
-        pass
-
-    def pass_turn(self):
-        pass
-
-    def check_king(self):
-        pass
+    async def pass_turn(self):
+        data = {
+            "Command": "PassTurn",
+            "Password": self.Password,
+        }
+        await self.websocket.send(json.dumps(data))
 
     async def myPiece(self):
         data = {
@@ -64,12 +63,16 @@ class Trichess:
         }
         await self.websocket.send(json.dumps(data))
 
-    def promote(self):
-        pass
-
     async def check_turn(self):
         data = {
             "Command": "CheckTurn",
             "Password": self.Password,
         }
         await self.websocket.send(json.dumps(data))
+
+    def reconnecting_game(self):
+        pass
+    def check_king(self):
+        pass
+    def promote(self):
+        pass

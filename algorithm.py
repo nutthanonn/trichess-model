@@ -42,7 +42,8 @@ def walk_but_dont_eat(enemy_possible_move, possible_move, current_board, current
     for piece, move in enemy_possible_move.items():
         for move_field in move:
             block_move.append(move_field)
-    
+
+
     print("This is block move: ", block_move)
     
     min_value = 1000
@@ -56,7 +57,7 @@ def walk_but_dont_eat(enemy_possible_move, possible_move, current_board, current
                     if VALUE_PIECE[board['Piece']] < min_value:
                         min_value = VALUE_PIECE[board['Piece']]
                         min_piece = piece
-                        min_move = move_field
+                        min_move = random.choice(possible_move[piece])
     
     print(f"This is min piece: {min_piece} and min move: {min_move}")
 
@@ -74,13 +75,6 @@ def eat_priority_first(enemy_possible_move, possible_move, current_board, curren
     print("This is current board: ", current_board)
 
     # hadle if enemy can eat my piece
-
-    # for piece, move in enemy_possible_move.items():
-    #     for move_field in move:
-    #         for board in current_board:
-    #             if move_field == board['Field']:
-    #                 if board['Owner'] == current_player:
-    #                     possible_move[piece].remove(move_field)
 
     max_value = 0
     max_piece = None

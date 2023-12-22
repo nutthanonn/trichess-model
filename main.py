@@ -224,16 +224,17 @@ async def main(url, type_algorithm, reconnect=False):
         time.sleep(1)
 
 if __name__ == '__main__':
-    URL = 'ws://192.168.1.157:8181/game'
-    n_player = int(input("Enter number of player [int]: "))
+    URL = 'ws://192.168.1.100:8181/game'
+    asyncio.run(main(URL, 2),)
+    # n_player = int(input("Enter number of player [int]: "))
     # URL = input("Enter URL: ")
     
-    for i in range(n_player):
-        print(f"Select algorithm for player {i+1}")
-        print(MESSAGE.ALGORITHM)
-        algo = 2
+    # for i in range(n_player):
+    #     print(f"Select algorithm for player {i+1}")
+    #     print(MESSAGE.ALGORITHM)
+    #     algo = 2
         
-        threading.Thread(target=asyncio.run, args=(main(URL, algo),)).start()
-        print("Thread: ", i, " started")
+    #     threading.Thread(target=asyncio.run, args=(main(URL, algo),)).start()
+    #     print("Thread: ", i, " started")
 
-        time.sleep(0.25)
+    #     time.sleep(0.25)

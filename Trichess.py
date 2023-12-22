@@ -70,9 +70,20 @@ class Trichess:
         }
         await self.websocket.send(json.dumps(data))
 
+    async def check_king(self):
+        data = {
+            "Command": "CheckKing",
+            "Password": self.Password
+        }
+        await self.websocket.send(json.dumps(data))
+
+    async def promote(self):
+        data = {
+            "Command": "Promote",
+            "Password": self.Password,
+            "Promotion": "Queen"
+        }
+        await self.websocket.send(json.dumps(data))
+
     def reconnecting_game(self):
-        pass
-    def check_king(self):
-        pass
-    def promote(self):
         pass

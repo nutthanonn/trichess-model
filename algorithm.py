@@ -10,6 +10,9 @@ import random
 import MESSAGE
 import time
 
+# king eat
+random.seed(5311)
+
 VALUE_PIECE = {
     "King": 1000,
     "Queen": 9,
@@ -32,7 +35,7 @@ def algorithm_provider(enemy_possible_move, possible_move, current_board, type_a
 def play_random(possible_move):
     while True:
         try:
-            print("This is possible move: ", possible_move)
+            # print("This is possible move: ", possible_move)
 
             random_piece = random.choice(list(possible_move.keys()))
             random_move = random.choice(possible_move[random_piece])
@@ -43,62 +46,120 @@ def play_random(possible_move):
         except:
             pass
 
-        time.sleep(1)
+        time.sleep(0.5)
 
-def walk_dodge(enemy_possible_move, possible_move, current_board, current_player):
-    dodge_moves = set()
+def walk_dodge(enemy_possible_move, possible_move, current_board, current_player, block_move, enemy_all_move):
+    dodge_moves = []
+    print(MESSAGE.TEST_DODGE)
 
-    for piece, enemy_moves in enemy_possible_move.items():
-        for enemy_move_field in enemy_moves:
-            for board in current_board:
-                if enemy_move_field == board['Field'] and board['Owner'] == current_player:
-                    # The current player's piece is under threat, find possible dodge moves
-                    for move_field in possible_move.get(piece, []):
-                        dodge_moves.add(move_field)
+    for my_piece, my_moves in possible_move.items():
+        if my_piece in enemy_all_move:
+            dodge_moves.append({
+                "Field": my_piece,
+                "Movable": [x for x in my_moves if x not in block_move],
+                "Value": VALUE_PIECE[[x['Piece'] for x in current_board if x['Field'] == my_piece][0]],
+            })
 
-    # Filter out duplicate dodge moves
-    dodge_moves = list(set(dodge_moves))
+    # for enemy_piece, enemy_moves in enemy_possible_move.items():
+    #     for my_piece, my_moves in possible_move.items():
+    #         if my_piece in enemy_moves:
+    #             dodge_moves.append({
+    #                 "Field": my_piece,
+    #                 "Movable": [x for x in possible_move[my_piece] if x not in block_move],
+    #                 "Value": VALUE_PIECE[[x['Piece'] for x in current_board if x['Field'] == my_piece][0]],
+    #             })
+
+    # for piece, enemy_moves in enemy_possible_move.items():
+    #     for enemy_move_field in enemy_moves:
+    #         for board in current_board:
+    #             if enemy_move_field == board['Field'] and board['Owner'] == current_player:
+
+    #                 if board['Field'] in possible_move:
+    #                     dodge_moves.append({
+    #                         "Field": board['Field'],
+    #                         "Movable": [x for x in possible_move[board['Field']] if x not in block_move],
+    #                         "Value": VALUE_PIECE[board['Piece']],
+    #                     })
+
+    if len(dodge_moves) == 0:
+        return None, None
     
-    print("Dodge moves: ", dodge_moves)
+    dodge_moves = sorted(dodge_moves, key=lambda x: (x['Value'], len(x['Movable'])), reverse=True)
     
-    if not dodge_moves:
-        return None
-    
-    # Select a random dodge move
-    random_dodge_move = random.choice(dodge_moves)
-    
-    print(f"Selected dodge move: {random_dodge_move}")
+    print("This is dodge moves: ", dodge_moves)
 
-    return piece, random_dodge_move
+    if len(dodge_moves[0]["Movable"]) > 0:
+        return dodge_moves[0]["Field"], dodge_moves[0]["Movable"][0]
+    
+    print('CANT DODGE accept enemy eat')
+    return walk_but_dont_eat(enemy_possible_move, possible_move, current_board, current_player, False)
 
-def walk_but_dont_eat(enemy_possible_move, possible_move, current_board, current_player):
+
+def walk_but_dont_eat(enemy_possible_move, possible_move, current_board, current_player, accept_eat=False):
     block_move = set(move_field for moves in enemy_possible_move.values() for move_field in moves)
     print("This is block move: ", block_move)
 
-    piece, random_dodge = walk_dodge(enemy_possible_move, possible_move, current_board, current_player)
-    
-    if random_dodge is not None:
-        return piece, random_dodge
+    enemy_all_move = []
+    for enemy_moves in enemy_possible_move.values():
+        enemy_all_move += enemy_moves
 
-    
-    min_value = float('inf')
-    min_piece = None
-    min_move = None
+    if accept_eat:
+        piece, random_dodge = walk_dodge(enemy_possible_move, possible_move, current_board, current_player, block_move, enemy_all_move)
 
-    for piece, moves in possible_move.items():
-        for move_field in moves:
-            for board in current_board:
-                if board['Owner'] == current_player and move_field not in block_move:
-                    piece_value = VALUE_PIECE[board['Piece']]
-                    if piece_value < min_value or (piece_value == min_value and piece < min_piece):
-                        min_value = piece_value
-                        min_piece = piece
-                        min_move = move_field
+        if random_dodge is not None:
+            print(MESSAGE.DODGE)
+            return piece, random_dodge
+        
     
-    print(f"This is min piece: {min_piece} and min move: {min_move}")
+    
+    collect_piece = []
+    for my_piece, my_moves in possible_move.items():
+        for move in my_moves:
+            if move not in enemy_all_move:
+                collect_piece.append({
+                    "Piece": my_piece,
+                    "Move": move,
+                    "Value": VALUE_PIECE[[x['Piece'] for x in current_board if x['Field'] == my_piece][0]],
+                })
 
-    return min_piece, min_move
+    print("======================== THIS IS POSSIBLE MOVE DONT EAT ========================")
+    print(collect_piece)
+
+    collect_piece.sort(key=lambda x: x["Value"])
+
+    return collect_piece[0]["Piece"], collect_piece[0]["Move"]
+
+    # possible_move_dont_eat = {}
+
+    # for enemy_piece, enemy_moves in enemy_possible_move.items():
+    #     for my_piece, my_moves in possible_move.items():
+    #         for my_move in my_moves:
+    #             if my_move not in enemy_moves:
+    #                 if my_piece not in possible_move_dont_eat:
+    #                     possible_move_dont_eat[my_piece] = []
+
+    #                 possible_move_dont_eat[my_piece].append(my_move)
+    # print("======================== THIS IS POSSIBLE MOVE DONT EAT ========================")
+    # print(possible_move_dont_eat)
+    
+    # return play_random(possible_move_dont_eat)
                 
+def is_safe_move(piece, move, current_board):
+    current_piece = None
+    current_move = None
+
+    for board in current_board:
+        if board['Field'] == piece:
+            current_piece = board['Piece']
+        
+        if board['Field'] == move:
+            current_move = board['Piece']
+
+    if current_piece == "Queen" and current_move == "Pawn":
+        print("CANT MOVE TO THIS PLACE")
+        return True
+
+    return False
 
 def eat_priority_first(enemy_possible_move, possible_move, current_board, current_player):
     current_board = current_board['Board']
@@ -106,122 +167,73 @@ def eat_priority_first(enemy_possible_move, possible_move, current_board, curren
 
     print(MESSAGE.ENEMY)
 
-    print("This is enemy possible move: ", enemy_possible_move)
-    print("This is possible move: ", possible_move)
-    print("This is current board: ", current_board)
-
     max_value = 0
     max_piece = None
     max_move = None
 
-    for piece, move in possible_move.items():
-        for move_field in move:
-            for board in current_board:
-                if move_field == board['Field']:
-                    if VALUE_PIECE[board['Piece']] > max_value and board['Owner'] != current_player:
-                        max_value = VALUE_PIECE[board['Piece']]
-                        max_piece = piece
-                        max_move = move_field
+    enemy_piece = enemy_possible_move.keys()
 
-                    if VALUE_PIECE[board['Piece']] == max_value and board['Owner'] != current_player:
-                        if max_piece < piece:
-                            max_piece = piece
-                            max_move = move_field
+    for my_piece, my_moves in possible_move.items():
+        for move in my_moves:
+            if move in enemy_piece:
+                
+                for board in current_board:
+                    if board['Field'] == move:
+                        if VALUE_PIECE[board['Piece']] > max_value:
+                            max_value = VALUE_PIECE[board['Piece']]
+                            max_piece = my_piece
+                            max_move = move
+
+    # for piece, moves in possible_move.items():
+    #     for move_field in moves:
+    #         for board in current_board:
+    #             if move_field == board['Field']:
+    #                 piece_value = VALUE_PIECE[board['Piece']]
+    #                 if piece_value > max_value and board['Owner'] != current_player:
+    #                     max_value = piece_value
+    #                     max_piece = piece
+    #                     max_move = move_field
+
+    #                 if piece_value == max_value and board['Owner'] != current_player:
+    #                     if max_piece is None or piece < max_piece:
+    #                         max_piece = piece
+    #                         max_move = move_field
+
+    if max_piece is None or max_move and None or is_safe_move(max_piece, max_move, current_board):
+        return walk_but_dont_eat(enemy_possible_move, possible_move, current_board, current_player, True) # วิ่งหนี
+
+    # compare between enemy who can eat my piece
+    my_piece_enemy_eat = []
+
+    for enemy_piece, enemy_moves in enemy_possible_move.items():
+        for my_piece, my_moves in possible_move.items():
+            if my_piece in enemy_moves:
+                my_piece_enemy_eat.append({
+                    "Piece": my_piece,
+                    "Value": VALUE_PIECE[[x['Piece'] for x in current_board if x['Field'] == my_piece][0]],
+                })
+    
+    print("This is enemy can eat: ", my_piece_enemy_eat)
+    
+    if len(my_piece_enemy_eat) > 0:
+        for i in my_piece_enemy_eat:
+            if i['Value'] > max_value:
+                piece_can_move = possible_move[i['Piece']]
+                enemy_all_move = []
+                
+                for enemy_moves in enemy_possible_move.values():
+                    enemy_all_move += enemy_moves
+
+                for move in piece_can_move:
+                    if move not in enemy_all_move:
+                        print(MESSAGE.ENEMY_CAN_EAT)
+
+                        max_value = i['Value']
+                        max_piece = i['Piece']
+                        max_move = move
+
+    # if enemy eat my piece and this my piece priority is high more than I can eat enemy piece, I will dodge_moves
 
     print(f"This is max piece: {max_piece} and max move: {max_move}")
 
-    if max_piece is None or max_move is None:
-        return walk_but_dont_eat(enemy_possible_move, possible_move, current_board, current_player)
-    
-    # if max_move in enemy_possible_move.get(max_piece, []):
-    #     print("Selected move is not safe, finding alternative.")
-
     return max_piece, max_move
-
-def check_8(target):
-    swap_color = {"GA":"RH", "GB":"RG", "GC":"RF", "GD":"RE", "GE":"BD", "GF":"BC", "GG":"BB", "GH":"BA",
-                  "BA":"GH", "BB":"GG", "BC":"GF", "BD":"GE", "BE":"RD", "BF":"RC", "BG":"RB", "BH":"RA",
-                  "RA":"BH", "RB":"BG", "RC":"BF", "RD":"BE", "RE":"GD", "RF":"GC", "RG":"GB", "RH":"GA",}
-    board_dict = {"A":1,"B":2,"C":3,"D":4,"E":5,"F":6,"G":7,"H":8}
-    board_list = ["A","B","C","D","E","F","G","H"]
-    number_list = ["1","2","3","4","4","3","2","1"]
-    straight = ["Queen", "Rook"]
-    oblique = ["Queen", "Bishop"]
-
-    # ไม่เล่นตรงกลาง
-    if((target[2] == "E" or target[2] == "D") and target[3] == "4"):
-        return
-    
-    # for i in range(9):
-    #     check = False
-        # target[0] + target[1] + target[2]
-        
-
-        """ concept for loop check if found enemy break small loop if its cant eat that continue but if can eat break   """
-
-        #straight
-
-        # check A B C D E F G H
-        for ii in range(board_dict[target[1]], 9):
-            #check
-            target[0] + board_list[ii] + target[2]
-            break
-
-        for ii in range(board_dict[target[1]], -1, -1):
-            #check
-            target[0] + board_list[ii] + target[2]
-            break
-        
-        #check 1 2 3 4 4 3 2 1
-        for ii in range(int(target[2]), 5):
-            break
-        for iii in range(4, 0, -1):
-                #switch color
-                check
-                break
-        
-        for ii in range(int(target[2]), 0, -1):
-            break
-
-
-        #oblique
-
-        # No switch color
-        count = 0
-        for ii in range(int(target[2]), 0, -1):
-            count += 1
-            board_list[board_dict[target[1]] - count]
-            break
-
-        count = 0
-        for ii in range(int(target[2]), 0, -1):
-            count += 1
-            board_list[board_dict[target[1]] + count]
-            break
-        
-        #switch color
-        count = 0
-        for ii in range(int(target[2]), 5):
-            count += 1
-            board_list[board_dict[target[1]] + count]
-            break
-        for iii in range(4, 0, -1):
-            #switch color
-            count += 1
-            board_list[board_dict[target[1]] + count]
-            break
-
-        count = 0
-        for ii in range(int(target[2]), 5):
-            count += 1
-            board_list[board_dict[target[1]] - count]
-            break
-        for iii in range(4, 0, -1):
-            #switch color
-            count += 1
-            board_list[board_dict[target[1]] - count]
-            # if board_list[board_dict[target[1]] - count] == "H" or board_list[board_dict[target[1]] - count] == "A":
-                # break
-
-
-    current_board = current_board['Board']

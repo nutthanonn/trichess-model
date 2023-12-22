@@ -63,7 +63,7 @@ async def check_my_king(trichess):
             await trichess.check_king()
             response = await trichess.receive_response()
 
-            # print(response)
+            print(response)
             move_able = []
 
             if response['Status'] == 'Success':
@@ -137,7 +137,7 @@ def check_pass(possible_move):
 async def main(url, type_algorithm):
     trichess = Trichess.Trichess(url)
     await trichess.connect()
-
+    count_turn = 0
     # loop wait to connect to game
     await wait_connection(trichess)
     
@@ -147,6 +147,7 @@ async def main(url, type_algorithm):
         try:
             turn_res = await wait_my_turn(trichess)
             if turn_res:
+                count_turn += 1
                 print(MESSAGE.MY_TURN)
                 trichess.Board, trichess.enemyPiece = turn_res
 

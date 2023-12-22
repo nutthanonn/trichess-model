@@ -134,7 +134,7 @@ def check_pass(possible_move):
     return all(len(value) == 0 for value in possible_move.values())
 
 
-async def main(url, type_algorithm):
+async def main(url, type_algorithm, reconnect=False):
     count_turn = 0
     trichess = Trichess.Trichess(url)
     await trichess.connect()

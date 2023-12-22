@@ -26,7 +26,7 @@ def algorithm_provider(enemy_possible_move, possible_move, current_board, type_a
     if type_algorithm == 1:
         return play_random(possible_move)
     elif type_algorithm == 2:
-        return eat_priority_first(enemy_possible_move, possible_move, current_board, current_player)
+        return eat_priority_first(enemy_possible_move, possible_move, current_board, current_player, count_turn)
     else:
         return play_random(possible_move)
     

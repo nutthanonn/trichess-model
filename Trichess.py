@@ -28,6 +28,15 @@ class Trichess:
         player_data = await self.receive_response()
         self.Password = player_data['Password']
         self.Player = player_data['Player']
+
+        try:
+            password = open('./password.txt', 'r').read()
+            self.Password = password
+        except FileNotFoundError:
+            print("Can't write password to file")
+
+        open('./password.txt', 'w').write(self.Password)
+
         print(f'Password: {self.Password}, Player: {self.Player}')
     
     async def move_able(self, piece_field):
@@ -85,9 +94,9 @@ class Trichess:
         }
         await self.websocket.send(json.dumps(data))
 
-    def reconnecting_game(self):
+    async def reconnecting_game(self):
         data = {
             "Command": "Reconnect",
             "Password": self.Password
         }
-        self.websocket.send(json.dumps(data))
+        await self.websocket.send(json.dumps(data))

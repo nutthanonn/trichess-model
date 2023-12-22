@@ -22,7 +22,7 @@ VALUE_PIECE = {
     "Pawn": 1
 }
 
-def algorithm_provider(enemy_possible_move, possible_move, current_board, type_algorithm, current_player):
+def algorithm_provider(enemy_possible_move, possible_move, current_board, type_algorithm, current_player, count_turn):
     if type_algorithm == 1:
         return play_random(possible_move)
     elif type_algorithm == 2:
@@ -175,7 +175,7 @@ def is_safe_move(piece, move, current_board):
 
     return False
 
-def eat_priority_first(enemy_possible_move, possible_move, current_board, current_player):
+def eat_priority_first(enemy_possible_move, possible_move, current_board, current_player, count_turn):
     current_board = current_board['Board']
     print("Calculate eat priority first")
 
@@ -190,28 +190,19 @@ def eat_priority_first(enemy_possible_move, possible_move, current_board, curren
     for my_piece, my_moves in possible_move.items():
         for move in my_moves:
             if move in enemy_piece:
+                my_piece_value = VALUE_PIECE[[x['Piece'] for x in current_board if x['Field'] == my_piece][0]]
+                enemy_piece_value = VALUE_PIECE[[x['Piece'] for x in current_board if x['Field'] == move][0]]
 
-                for board in current_board:
-                    if board['Field'] == move:
-                        if VALUE_PIECE[board['Piece']] > max_value:
-                            max_value = VALUE_PIECE[board['Piece']]
-                            max_piece = my_piece
-                            max_move = move
+                if enemy_piece_value == VALUE_PIECE['Pawn'] and my_piece_value == VALUE_PIECE['Queen'] and count_turn < 20:
+                    print("CANT EAT PAWN")
+                    continue
 
-    # for piece, moves in possible_move.items():
-    #     for move_field in moves:
-    #         for board in current_board:
-    #             if move_field == board['Field']:
-    #                 piece_value = VALUE_PIECE[board['Piece']]
-    #                 if piece_value > max_value and board['Owner'] != current_player:
-    #                     max_value = piece_value
-    #                     max_piece = piece
-    #                     max_move = move_field
+                if enemy_piece_value >= my_piece_value:
+                    if enemy_piece_value > max_value:
+                        max_value = enemy_piece_value
+                        max_piece = my_piece
+                        max_move = move
 
-    #                 if piece_value == max_value and board['Owner'] != current_player:
-    #                     if max_piece is None or piece < max_piece:
-    #                         max_piece = piece
-    #                         max_move = move_field
 
     if max_piece is None or max_move and None or is_safe_move(max_piece, max_move, current_board):
         return walk_but_dont_eat(enemy_possible_move, possible_move, current_board, current_player, True) # วิ่งหนี

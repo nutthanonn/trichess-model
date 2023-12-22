@@ -86,4 +86,8 @@ class Trichess:
         await self.websocket.send(json.dumps(data))
 
     def reconnecting_game(self):
-        pass
+        data = {
+            "Command": "Reconnect",
+            "Password": self.Password
+        }
+        self.websocket.send(json.dumps(data))

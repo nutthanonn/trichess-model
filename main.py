@@ -135,6 +135,7 @@ def check_pass(possible_move):
 
 
 async def main(url, type_algorithm):
+    count_turn = 0
     trichess = Trichess.Trichess(url)
     await trichess.connect()
 
@@ -143,12 +144,17 @@ async def main(url, type_algorithm):
     
     # loop playgame
     while True:
-        # loop wait my turn\
+        # loop wait my turn
         try:
             turn_res = await wait_my_turn(trichess)
             if turn_res:
                 print(MESSAGE.MY_TURN)
+                print(count_turn)
                 trichess.Board, trichess.enemyPiece = turn_res
+
+                # await get_my_piece(trichess)
+                # possible_move = await get_all_possible_move(trichess)
+                # print("Success get all possible move")
 
                 check_king = await check_my_king(trichess)
 
@@ -194,7 +200,8 @@ async def main(url, type_algorithm):
                         possible_move,
                         trichess.Board,
                         type_algorithm,
-                        trichess.Player
+                        trichess.Player,
+                        count_turn
                     )
                 
                 await trichess.send_move(curr_position, move_to)
@@ -209,6 +216,7 @@ async def main(url, type_algorithm):
                     if promote_response['Status'] == 'Success':
                         print("PROMOTE SUCCESS")
 
+                count_turn += 1
         except KeyboardInterrupt:
             print("KeyboardInterrupt")
             break

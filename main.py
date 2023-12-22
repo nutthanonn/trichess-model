@@ -163,10 +163,10 @@ async def main(url, type_algorithm):
         time.sleep(1)
 
 if __name__ == '__main__':
-    URL = 'ws://192.168.1.100:8181/game'
-    asyncio.run(main(URL, 2))
+    URL = 'ws://192.168.100.19:8181/game'
+    asyncio.run(main(URL, 1))
     # n_player = int(input("Enter number of player [int]: "))
-    # # URL = input("Enter URL: ")
+    # URL = input("Enter URL: ")
     
     # for i in range(n_player):
     #     print(f"Select algorithm for player {i+1}")

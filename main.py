@@ -150,6 +150,11 @@ async def main(url, type_algorithm):
                 print(MESSAGE.MY_TURN)
                 trichess.Board, trichess.enemyPiece = turn_res
 
+                await get_my_piece(trichess)
+                possible_move = await get_all_possible_move(trichess)
+                print(possible_move)
+                print("Success get all possible move")
+                
                 check_king = await check_my_king(trichess)
 
                 if check_king:
@@ -203,7 +208,7 @@ async def main(url, type_algorithm):
                 if move_response['Status'] == 'Success':
                     print(MESSAGE.MOVE_SUCCESS)
                     
-                    await trichess.promote()
+                    trichess.promote()
                     promote_response = await trichess.receive_response()
                     print(f"This is promote response: {promote_response}")
                     if promote_response['Status'] == 'Success':
@@ -216,7 +221,7 @@ async def main(url, type_algorithm):
         time.sleep(1)
 
 if __name__ == '__main__':
-    URL = 'ws://192.168.1.157:8181/game'
+    URL = 'ws://192.168.1.100:8181/game'
     n_player = int(input("Enter number of player [int]: "))
     # URL = input("Enter URL: ")
     

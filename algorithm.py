@@ -121,6 +121,20 @@ def walk_but_dont_eat(enemy_possible_move, possible_move, current_board, current
                     "Move": move,
                     "Value": VALUE_PIECE[[x['Piece'] for x in current_board if x['Field'] == my_piece][0]],
                 })
+    
+    if len(collect_piece) == 0:
+        piece_collection = []
+        for my_piece, my_moves in possible_move.items():
+            for move in my_moves:
+                piece_collection.append({
+                    "Piece": my_piece,
+                    "Move": move,
+                    "Value": VALUE_PIECE[[x['Piece'] for x in current_board if x['Field'] == my_piece][0]],
+                })
+
+        rd = random.choice(piece_collection)
+        return rd["Piece"], rd["Move"]
+                
 
     print("======================== THIS IS POSSIBLE MOVE DONT EAT ========================")
     print(collect_piece)
@@ -176,7 +190,7 @@ def eat_priority_first(enemy_possible_move, possible_move, current_board, curren
     for my_piece, my_moves in possible_move.items():
         for move in my_moves:
             if move in enemy_piece:
-                
+
                 for board in current_board:
                     if board['Field'] == move:
                         if VALUE_PIECE[board['Piece']] > max_value:

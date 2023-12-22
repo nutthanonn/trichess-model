@@ -35,7 +35,7 @@ class Trichess:
         except FileNotFoundError:
             print("Can't write password to file")
 
-        open('./password.txt', 'w').write(self.Password)
+        open('./password.txt', 'w').write(str(self.Password))
 
         print(f'Password: {self.Password}, Player: {self.Player}')
     

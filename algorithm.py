@@ -123,8 +123,6 @@ def check_8(target):
         #RGB E F G H
         return
     
-        
-
     """ concept for loop check if found enemy break small loop if its cant eat that continue but if can eat break   """
 
         #straight

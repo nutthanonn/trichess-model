@@ -30,11 +30,11 @@ class Trichess:
         self.Player = player_data['Player']
 
         try:
-            password = open('./password.txt', 'r').read()
-            self.Password = password
+            password = int(open('./password.txt', 'r').read())
         except FileNotFoundError:
             print("Can't write password to file")
 
+        self.Password = password
         open('./password.txt', 'w').write(str(self.Password))
 
         print(f'Password: {self.Password}, Player: {self.Player}')
